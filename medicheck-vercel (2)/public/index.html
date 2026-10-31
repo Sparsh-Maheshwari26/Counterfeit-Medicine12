@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counterfeit Medicine System</title>
+<meta name="description" content="Student prototype that screens medicine label details against public product listings.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z' fill='%232563eb'/%3E%3Crect x='20' y='25' width='24' height='14' rx='7' fill='none' stroke='%23fff' stroke-width='3' transform='rotate(-35 32 32)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10233f;--muted:#667992;--blue:#2563eb;--line:#e3ebf6;--pale:#f3f7ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);background:linear-gradient(130deg,#f5f8ff,#eff6ff 46%,#f9fbff);min-height:100vh}
+h1,h2,h3{font-family:'Manrope',system-ui,sans-serif;letter-spacing:-.025em;margin:0}
+a{color:#2363d1}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+aside{background:#fff;border-right:1px solid #e6edf7;padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;gap:11px;align-items:center;padding:0 6px 16px;border-bottom:1px solid #e7edf6;margin-bottom:16px}
+.brand b{font-family:'Manrope',system-ui,sans-serif;font-weight:800;font-size:1.02rem;line-height:1.2;display:block}
+.brand small{color:#8a9bb1;font-size:.68rem;letter-spacing:.13em;text-transform:uppercase}
+nav a{display:block;padding:.7rem .8rem;border-radius:12px;color:#50627a;text-decoration:none;font-weight:600;font-size:.94rem;border:1px solid transparent;margin-bottom:5px}
+nav a:hover{background:#f1f6ff}
+nav a.on{background:#eaf2ff;border-color:#d6e5ff;color:#1e55bd;font-weight:700}
+.note{border:1px solid var(--line);background:#f8fbff;border-radius:14px;padding:12px 13px;color:#6a7b91;font-size:.78rem;line-height:1.55;margin-top:18px}
+.note b{color:#1c55bd}
+main{padding:30px clamp(16px,4vw,48px) 20px;max-width:1100px;width:100%}
+.eyebrow{color:var(--blue);font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px}
+.sub{color:#6b7e97;margin:7px 0 22px;line-height:1.65}
+.hero{padding:30px;border-radius:28px;color:#fff;background:radial-gradient(circle at 87% 10%,rgba(90,199,255,.35),transparent 25%),linear-gradient(118deg,#102b63,#1746a7 54%,#2376d9);box-shadow:0 22px 55px rgba(31,76,154,.17);margin-bottom:18px}
+.hero h1{font-size:clamp(2rem,4vw,3rem);line-height:1.08;margin:12px 0}
+.hero p{color:rgba(255,255,255,.8);max-width:640px;line-height:1.65;margin:0}
+.kicker{display:inline-block;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);padding:7px 11px;border-radius:99px;font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.surface{background:rgba(255,255,255,.93);border:1px solid #e5edf8;border-radius:20px;padding:21px 22px;box-shadow:0 7px 24px rgba(31,65,116,.045)}
+.surface h3{font-size:1.08rem;margin-bottom:9px}
+.muted{color:#6b7e97;font-size:.91rem;line-height:1.6}
+.notice,.warn{padding:14px 16px;border-radius:14px;font-size:.87rem;line-height:1.6;border:1px solid #d8e6fb;background:#f5f9ff;color:#536b89}
+.warn{border-color:#f6ddb0;background:#fff9ed;color:#805a14}
+button,.btn{font:inherit;font-weight:700;border-radius:12px;border:1px solid #d8e4f6;background:#fff;color:var(--ink);padding:.65rem 1.1rem;cursor:pointer;text-decoration:none;display:inline-block;transition:transform .15s}
+button:hover{transform:translateY(-1px);border-color:#a9c7f8}
+button.primary{background:linear-gradient(110deg,#2563eb,#337ce9);color:#fff;border:0;box-shadow:0 7px 17px rgba(37,99,235,.18)}
+button:disabled{opacity:.6;cursor:wait}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #93b8f8;outline-offset:2px}
+form{border:1px solid #e2eaf5;border-radius:20px;background:rgba(255,255,255,.92);padding:20px 22px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px}
+label{display:block;font-size:.85rem;font-weight:600;margin:10px 0 5px}
+input{width:100%;font:inherit;padding:.6rem .75rem;border:1px solid #d5e0f0;border-radius:11px;background:#fff;color:var(--ink)}
+.hint{font-size:.76rem;color:#8192a9;line-height:1.5;margin-top:8px}
+.err{color:#a12626;background:#fff6f6;border:1px solid #f2c8c8;padding:11px 14px;border-radius:12px;margin-top:14px;font-size:.9rem}
+.result{border:1px solid;border-radius:20px;padding:22px;margin-top:22px;box-shadow:0 10px 32px rgba(30,70,140,.06)}
+.result.red{border-color:#f2c8c8;background:#fff6f6}.result.amber{border-color:#f4ddb0;background:#fffaf0}.result.blue{border-color:#d8e6fb;background:#f7faff}
+.label{color:#6b7e97;font-size:.75rem;text-transform:uppercase;font-weight:800;letter-spacing:.1em}
+.verdict{font-family:'Manrope',system-ui,sans-serif;font-weight:800;font-size:1.55rem;margin:7px 0}
+.score{font-size:2.5rem;font-weight:800;color:#173b75;margin:6px 0}.score small{font-size:1rem;color:#6b7e97;font-weight:500}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.metric{background:#fff;border:1px solid #e5edf8;border-radius:16px;padding:14px 16px}
+.metric b{display:block;font-family:'Manrope',system-ui,sans-serif;font-size:1.25rem;color:#183764;margin-top:4px}
+.tablewrap{overflow:auto;border:1px solid #e5edf8;border-radius:16px;background:#fff;margin-top:14px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #eef3fa;vertical-align:top}
+th{background:#f6f9ff;color:#5a6e8a;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;position:sticky;top:0}
+.step{height:34px;width:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;background:#e8f1ff;color:#2057c1;font-weight:800;margin-bottom:11px}
+footer{color:#94a2b5;font-size:.76rem;padding:18px 0 6px;border-top:1px solid #e5edf8;margin-top:30px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row input{flex:1;min-width:200px}
+h2.sec{font-size:1.3rem;margin:26px 0 12px}
+.ac{position:relative}
+.ac ul{position:absolute;z-index:20;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;background:#fff;border:1px solid #d5e0f0;border-radius:12px;box-shadow:0 12px 28px rgba(31,65,116,.14);max-height:240px;overflow:auto}
+.ac li{padding:.5rem .7rem;border-radius:8px;cursor:pointer;font-size:.92rem}
+.ac li[aria-selected=true],.ac li:hover{background:#eaf2ff;color:#1e55bd}
+.loader{border:1px solid #d8e6fb;background:#f7faff;border-radius:20px;padding:26px 22px;margin-top:22px;text-align:center}
+.spin{width:38px;height:38px;margin:0 auto 14px;border:4px solid #dbe7fb;border-top-color:var(--blue);border-radius:50%;animation:rot .8s linear infinite}
+.lmsg{font-weight:700;color:#1e55bd;min-height:1.4em}
+.bar{height:6px;border-radius:99px;background:#e3ebf6;margin:16px auto 0;max-width:340px;overflow:hidden}
+.bar i{display:block;height:100%;width:40%;border-radius:99px;background:linear-gradient(110deg,#2563eb,#47c5e9);animation:slide 1.2s ease-in-out infinite}
+@keyframes rot{to{transform:rotate(360deg)}}@keyframes slide{0%{margin-left:-40%}100%{margin-left:100%}}
+@media(prefers-reduced-motion:reduce){.spin,.bar i{animation-duration:3s}}
+.mm{background:#fff;border:1px solid #e5edf8;border-radius:16px;padding:14px 16px;margin-bottom:10px}
+.mm b{display:block;font-family:'Manrope',system-ui,sans-serif;margin-bottom:6px}
+.mm div{font-size:.9rem;line-height:1.6;color:#4d607b;overflow-wrap:anywhere}.mm span{color:#8192a9}
+details.more{margin-top:14px}details.more summary{cursor:pointer;font-weight:700;color:#1e55bd}
+@media(max-width:800px){.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid #e6edf7}nav{display:flex;gap:6px;overflow:auto}nav a{white-space:nowrap;margin:0}.note{display:none}.grid2,.cols,.metrics{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="brand">
+    <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 8 14v16c0 15 10 26 24 30 14-4 24-15 24-30V14z" fill="#2563eb"/><rect x="20" y="25" width="24" height="14" rx="7" fill="none" stroke="#fff" stroke-width="3" transform="rotate(-35 32 32)"/></svg>
+    <div><b>Counterfeit Medicine<br>System</b><small>Verify with care</small></div>
+  </div>
+  <nav id="nav" aria-label="Main">
+    <a href="#/" data-p="/">⌂&nbsp; Overview</a>
+    <a href="#/verify" data-p="/verify">⌕&nbsp; Verify medicine</a>
+    <a href="#/database" data-p="/database">▦&nbsp; Medicine database</a>
+    <a href="#/how" data-p="/how">ⓘ&nbsp; How it works</a>
+  </nav>
+  <div class="note"><b>Safety note</b><br>Matching a medicine name does not authenticate its batch. Check through the manufacturer or a licensed pharmacist.</div>
+</aside>
+<main id="app"></main>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso = d => d.toISOString().slice(0, 10);
+const addDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
+const FOOT = '<footer>Student project prototype · Reference lookup only · Never use this page as the sole basis for taking or rejecting medicine.</footer>';
+const head = (eyebrow, title, sub) => `<div class="eyebrow">${eyebrow}</div><h1 style="font-size:2rem">${title}</h1><p class="sub">${sub}</p>`;
+
+const pages = {
+'/': () => `
+  <div class="hero"><span class="kicker">Medicine label checker</span><h1>Check a medicine label.</h1>
+  <p>Enter the details from the pack. Get a simple score, see what looks wrong, and review matching reference products.</p></div>
+  <div class="grid2">
+    <div class="surface"><h3>How it works</h3><div class="muted">1. Enter label details.<br>2. Compare with product listings in the database.<br>3. Review the score and warnings.</div><p><a class="btn primary" href="#/verify">Check a medicine →</a></p></div>
+    <div class="surface"><h3>Reference source</h3><div class="muted">Listings from the openFDA NDC Directory are stored in a Postgres database. Anything not stored yet is fetched live and saved.<br><br>Listings help compare labels. They do not prove a batch is genuine.</div><p><a class="btn" href="#/database">Browse listings →</a></p></div>
+  </div>
+  <p class="muted" style="margin-top:14px">Student project. For real concerns, contact the manufacturer or a licensed pharmacist.</p>${FOOT}`,
+
+'/verify': () => `
+  ${head('MEDICINE CHECK', 'Check a medicine', 'Enter the details from the pack and review the result.')}
+  <div class="notice" style="margin-bottom:14px">A product listing alone cannot prove a batch is genuine. The batch number is used for the check only and is never saved.</div>
+  <form id="f" novalidate>
+    <div class="cols">
+      <div>
+        <label for="medicine_name">Medicine name on label *</label><div class="ac"><input id="medicine_name" name="medicine_name" placeholder="Brand or generic name" maxlength="120" required autocomplete="off"></div>
+        <label for="manufacturer">Manufacturer / marketer</label><input id="manufacturer" name="manufacturer" placeholder="Company name as printed">
+        <label for="batch_number">Batch / lot number *</label><div class="ac"><input id="batch_number" name="batch_number" placeholder="From the pack" maxlength="60" required autocomplete="off"></div>
+        <label for="product_code">Product code / NDC (optional)</label><input id="product_code" name="product_code" placeholder="e.g. 0363-0123" maxlength="30">
+      </div>
+      <div>
+        <label for="manufacture_date">Manufacturing date</label><input type="date" id="manufacture_date" name="manufacture_date" value="${addDays(-30)}">
+        <label for="expiry_date">Expiry date</label><input type="date" id="expiry_date" name="expiry_date" value="${addDays(365)}">
+        <label for="country">Manufacturing country / location</label><input id="country" name="country" placeholder="As printed (recorded only)">
+        <div class="hint">Dates are checked for consistency only. openFDA does not confirm printed dates, batch numbers or manufacturing site.</div>
+      </div>
+    </div>
+    <p><button class="primary" id="go" style="width:100%">Check medicine</button></p>
+    <div id="err" role="alert"></div>
+  </form>
+  <div id="out" aria-live="polite"></div>${FOOT}`,
+
+'/database': () => `
+  ${head('DATABASE', 'Medicine database', 'Product listings stored in our Postgres database, seeded from the openFDA NDC Directory.')}
+  <div id="dbwarn"></div>
+  <div class="metrics" id="stats"><div class="metric"><span class="label">Stored listings</span><b>…</b></div><div class="metric"><span class="label">Last sync</span><b>…</b></div><div class="metric"><span class="label">Checks logged</span><b>…</b></div></div>
+  <div class="surface" style="margin-bottom:16px"><h3>Sync common medicines</h3><div class="muted">The 500 official openFDA listings that ship with this project are loaded automatically. This button also downloads listings for about 15 commonly sold medicines from openFDA and saves them. Searches and checks for anything not stored are fetched live and saved automatically.</div>
+    <p style="margin-bottom:0"><button class="primary" id="sync">Sync from openFDA ↻</button> <span class="muted" id="syncmsg" role="status"></span></p></div>
+  <div class="grid2">
+    <div class="surface"><h3>Source</h3><div class="muted">openFDA Drug NDC Directory. Entries are labeler-submitted. FDA states inclusion does not mean it independently verified the details or that the product is FDA-approved.</div></div>
+    <div class="surface"><h3>Fields not covered</h3><div class="muted">Listings do not validate a pack's batch number, dates, seal, hologram, contents or manufacturing location. Batch numbers you enter are never stored.</div></div>
+  </div>
+  <form id="sf" style="margin-top:16px"><div class="row"><div style="flex:1;min-width:200px"><label for="q">Search</label><input id="q" placeholder="Type a name, company or identifier…" maxlength="80"></div><button class="primary">Search</button></div></form>
+  <div id="sout" aria-live="polite"></div>
+  <h2 class="sec">Recent checks</h2><div id="recent" class="muted">Loading…</div>
+  <h2 class="sec">Other sources</h2>
+  <div class="surface"><div class="muted">For Indian approvals see the <a href="https://www.cdscoonline.gov.in/CDSCO/cdscoDrugs/" target="_blank" rel="noopener noreferrer">CDSCO approved drugs portal</a>. For quality-defect and spurious-drug reports see <a href="https://cdscoonline.gov.in/CDSCO/viewPublicNSQDrug" target="_blank" rel="noopener noreferrer">CDSCO NSQ and spurious-drug alerts</a>. This prototype does not import either.</div></div>${FOOT}`,
+
+'/how': () => `
+  ${head('HELP', 'How it works', 'Four steps to review a medicine label.')}
+  <div class="grid2">${[
+    ['01','Label input','You enter the medicine name, batch or lot number, dates, manufacturer and an optional product code.'],
+    ['02','Reference lookup','The app looks up matching names, ingredients and product or package codes in its Postgres database, fetching from openFDA and saving the result if nothing is stored yet.'],
+    ['03','Date consistency','It checks whether expiry is in the past, manufacturing is in the future, or expiry is not after manufacturing.'],
+    ['04','Screening result','You get a status, a rule-based risk score and a list of mismatched details. A reference match never proves a pack is genuine.']
+  ].map(s => `<div class="surface"><div class="step">${s[0]}</div><h3>${s[1]}</h3><div class="muted">${s[2]}</div></div>`).join('')}</div>
+  <h2 class="sec">Current limitations</h2>
+  <div class="warn"><b>This is an educational prototype.</b><br>• It does not connect to a manufacturer's batch-verification system.<br>• openFDA is US listing data, not an Indian approvals database.<br>• A fake pack might copy the exact name, code and manufacturer of a real medicine.<br>• Real batch authentication needs a manufacturer-authorised serialisation API or regulator workflow.</div>
+  <h2 class="sec">Official resources</h2>
+  <ul class="muted"><li><a href="https://open.fda.gov/apis/drug/ndc/" target="_blank" rel="noopener noreferrer">openFDA NDC Directory API</a></li><li><a href="https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory" target="_blank" rel="noopener noreferrer">FDA National Drug Code Directory</a></li><li><a href="https://www.cdscoonline.gov.in/CDSCO/cdscoDrugs/" target="_blank" rel="noopener noreferrer">CDSCO approved drugs portal</a></li></ul>
+  <p><a class="btn primary" href="#/verify">Go to verification form →</a></p>${FOOT}`
+};
+
+async function api(url, opts) {
+  let r;
+  try { r = await fetch(url, opts); } catch { throw new Error('Network error. Check your connection.'); }
+  let data = {};
+  try { data = await r.json(); } catch {}
+  if (!r.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+  return data;
+}
+
+function renderResult(r) {
+  const mm = r.mismatches.length
+    ? r.mismatches.map(m => `<div class="mm"><b>${esc(m.field)}</b><div><span>Your Entry:</span> ${esc(m.entered || 'Not entered')}</div><div><span>${m.kind === 'rule' ? 'Expected:' : 'Database Record:'}</span> ${esc(m.reference)}</div></div>`).join('')
+    : `<div class="muted">${r.verdict === 'REFERENCE MATCH' ? 'All checked details match the available reference records.' : 'No reference record is available, so no details could be compared.'}</div>`;
+  return `<div class="result ${esc(r.tone)}">
+    <div class="label">Verification status</div><div class="verdict">${esc(r.verdict)}</div>
+    <div class="muted">${esc(r.summary)}</div>
+    <div class="score" style="margin-top:12px"><small>Risk Score: </small>${r.risk_score}<small>/100</small></div></div>
+    <p class="hint">Rule-based risk score: 0 means no concerns were found, 100 is the highest concern. It is not a probability that a medicine is fake or genuine.</p>
+    <h3 style="margin-top:18px;margin-bottom:10px">Mismatched Details</h3>${mm}
+    ${r.unavailable.length ? `<p class="hint">${r.unavailable.map(esc).join('<br>')}</p>` : ''}
+    ${r.similar.length ? `<details class="more"><summary>Matching reference listings</summary><p class="hint">Reference matches only, not a recommendation to replace or take a medicine. Confirm with a pharmacist or prescriber.</p><div class="muted">${r.similar.map(s => `• <b>${esc(s.brand_name || s.generic_name || 'Unnamed product')}</b> | ${esc(s.labeler_name || 'Company not listed')} | Code: ${esc(s.product_ndc || 'Not listed')}`).join('<br>')}</div></details>` : ''}
+    <div class="warn" style="margin-top:16px"><b>Important:</b> Never take, discard or return medicine based only on this prototype. For a suspicious pack in India, check the official <a href="https://cdscoonline.gov.in/CDSCO/viewPublicNSQDrug" target="_blank" rel="noopener noreferrer">CDSCO NSQ and spurious-drug alerts</a>, then contact the manufacturer using details from its official website or ask a licensed pharmacist.</div>`;
+}
+
+// Autocomplete: suggestions come from /api/suggest (database). Never overwrites input unless the user picks one.
+function autocomplete(input, fetchList) {
+  const ul = document.createElement('ul'); ul.id = input.id + '-list'; ul.setAttribute('role', 'listbox'); ul.hidden = true;
+  input.parentNode.appendChild(ul);
+  input.setAttribute('role', 'combobox'); input.setAttribute('aria-expanded', 'false'); input.setAttribute('aria-controls', ul.id); input.setAttribute('aria-autocomplete', 'list');
+  let timer, ticket = 0, active = -1, items = [];
+  const close = () => { ul.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; };
+  const mark = i => { active = i; [...ul.children].forEach((li, k) => li.setAttribute('aria-selected', k === i)); };
+  const pick = v => { input.value = v; close(); input.dispatchEvent(new Event('change')); };
+  const show = list => {
+    items = list; ul.innerHTML = '';
+    if (!list.length) return close();
+    list.forEach((v, i) => { const li = document.createElement('li'); li.setAttribute('role', 'option'); li.textContent = v; li.onmousedown = e => { e.preventDefault(); pick(v); }; ul.appendChild(li); });
+    ul.hidden = false; input.setAttribute('aria-expanded', 'true'); mark(-1);
+  };
+  input.addEventListener('input', () => {
+    clearTimeout(timer); const q = input.value.trim().replace(/\s+/g, ' ');
+    if (q.length < 2) { ticket++; return close(); }
+    timer = setTimeout(async () => {
+      const mine = ++ticket;
+      try { const list = await fetchList(q); if (mine === ticket) show(list); } catch { if (mine === ticket) close(); }
+    }, 200);
+  });
+  input.addEventListener('keydown', e => {
+    if (ul.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); mark((active + 1) % items.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); mark((active - 1 + items.length) % items.length); }
+    else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); pick(items[active]); }
+    else if (e.key === 'Escape') close();
+  });
+  input.addEventListener('blur', () => { clearTimeout(timer); ticket++; close(); });
+}
+
+function tableHTML(rows) {
+  if (!rows.length) return '<div class="notice" style="margin-top:14px">No listings found. Try the generic ingredient name or a different term.</div>';
+  return `<div class="tablewrap"><table><thead><tr><th>Product</th><th>Generic</th><th>Ingredients</th><th>Labeler</th><th>Code</th><th>Form</th></tr></thead><tbody>${rows.map(r =>
+    `<tr><td>${esc(r.brand_name || r.generic_name || 'Not listed')}</td><td>${esc(r.generic_name || 'Not listed')}</td><td>${esc(r.active_ingredients || 'Not listed')}</td><td>${esc(r.labeler_name || 'Not listed')}</td><td>${esc(r.product_ndc || 'Not listed')}</td><td>${esc(r.dosage_form || 'Not listed')}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+const init = {
+'/verify': () => {
+  const f = $('#f'), err = $('#err'), out = $('#out'), go = $('#go');
+  const suggest = (field, extra = '') => async q => (await api(`/api/suggest?field=${field}&q=${encodeURIComponent(q)}${extra}`)).suggestions;
+  autocomplete($('#medicine_name'), suggest('name'));
+  autocomplete($('#batch_number'), q => suggest('batch', `&medicine=${encodeURIComponent($('#medicine_name').value.trim())}`)(q));
+  const MSGS = ['Verifying medicine details...', 'Connecting to reference database...', 'Cross-checking medicine information...'];
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  f.onsubmit = async e => {
+    e.preventDefault(); err.innerHTML = ''; out.innerHTML = '';
+    const body = Object.fromEntries(new FormData(f));
+    if (!body.medicine_name.trim() || !body.batch_number.trim()) { err.innerHTML = '<div class="err">Enter both the medicine name and the batch / lot number.</div>'; return; }
+    go.disabled = true; go.textContent = 'Checking…';
+    out.innerHTML = '<div class="loader" role="status"><div class="spin"></div><div class="lmsg"></div><div class="bar"><i></i></div></div>';
+    let n = 0; const lmsg = $('.lmsg', out); lmsg.textContent = MSGS[0];
+    const ticker = setInterval(() => { n = (n + 1) % MSGS.length; lmsg.textContent = MSGS[n]; }, 700);
+    const started = Date.now();
+    let result, failure;
+    try { result = await api('/api/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
+    catch (x) { failure = x; }
+    await sleep(Math.max(0, 1500 - (Date.now() - started)));   // minimum 1.5 s, no extra delay for slower requests
+    clearInterval(ticker);
+    if (failure) { out.innerHTML = ''; err.innerHTML = `<div class="err">${esc(failure.message)}</div>`; }
+    else { out.innerHTML = renderResult(result); out.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    go.disabled = false; go.textContent = 'Check medicine';
+  };
+},
+'/database': () => {
+  const out = $('#sout'); let q = '', page = 0, rows = [];
+  const loadStats = async () => {
+    try {
+      const s = await api('/api/stats');
+      $('#stats').innerHTML = [['Stored listings', s.records.toLocaleString()], ['Last sync', s.last_sync ? new Date(s.last_sync).toLocaleString() : 'Never'], ['Checks logged', s.checks.toLocaleString()]]
+        .map(m => `<div class="metric"><span class="label">${m[0]}</span><b style="font-size:${m[0]==='Last sync'?'1rem':'1.25rem'}">${esc(m[1])}</b></div>`).join('');
+      $('#dbwarn').innerHTML = s.backend === 'postgres' ? '' : '<div class="warn" style="margin-bottom:14px"><b>Temporary storage.</b> No Postgres database is connected, so data resets often. Add one in Vercel → Storage and redeploy.</div>';
+      $('#recent').innerHTML = s.recent.length ? `<div class="tablewrap"><table><thead><tr><th>When</th><th>Medicine</th><th>Result</th><th>Risk score</th></tr></thead><tbody>${s.recent.map(r => `<tr><td>${esc(new Date(r.created_at).toLocaleString())}</td><td>${esc(r.medicine_name)}</td><td>${esc(r.verdict)}</td><td>${esc(r.score)}</td></tr>`).join('')}</tbody></table></div>` : 'No checks yet.';
+    } catch (x) { $('#dbwarn').innerHTML = `<div class="err" style="margin-bottom:14px">${esc(x.message)}</div>`; $('#recent').textContent = ''; }
+  };
+  loadStats();
+  $('#sync').onclick = async e => {
+    const b = e.target, m = $('#syncmsg'); b.disabled = true; b.textContent = 'Syncing…'; m.textContent = '';
+    try { const d = await api('/api/sync', { method: 'POST' }); m.textContent = d.skipped ? d.message : `Saved ${d.saved} listings.`; await loadStats(); }
+    catch (x) { m.textContent = x.message; }
+    b.disabled = false; b.textContent = 'Sync from openFDA ↻';
+  };
+  const draw = more => out.innerHTML = `<p class="muted" style="margin-top:14px">Showing ${rows.length} listings for “${esc(q)}”.</p>${tableHTML(rows)}${more ? '<p><button id="more">Load more</button></p>' : ''}`;
+  const load = async () => {
+    try {
+      const d = await api(`/api/search?q=${encodeURIComponent(q)}&page=${page}`);
+      rows = rows.concat(d.results); draw(d.has_more);
+      const m = $('#more'); if (m) m.onclick = () => { page++; m.disabled = true; m.textContent = 'Loading…'; load(); };
+    } catch (x) { out.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+  };
+  $('#sf').onsubmit = e => { e.preventDefault(); q = $('#q').value.trim(); if (!q) return; page = 0; rows = []; out.innerHTML = '<p class="muted">Searching…</p>'; load(); };
+}
+};
+
+function route() {
+  const p = (location.hash.slice(1) || '/');
+  const path = pages[p] ? p : '/';
+  $('#app').innerHTML = pages[path]();
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.p === path));
+  if (init[path]) init[path]();
+  window.scrollTo(0, 0);
+}
+addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
